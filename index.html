@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sport Center UIN Ar-Raniry</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            uin: {
+              green: '#0a5c36', // Hijau tua UIN Ar-Raniry
+              greenlight: '#14824d',
+              gold: '#d4af37',   // Emas
+              goldlight: '#f1d26d',
+              dark: '#112211',
+              accent: '#f2f9f5'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+  <!-- TOP BAR & NAVBAR -->
+  <header class="shadow-md bg-uin-green border-b-4 border-uin-gold sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex items-center space-x-3 text-center sm:text-left">
+        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-uin-gold shadow-md">
+          <div class="w-9 h-9 rounded-full border-2 border-uin-green flex flex-col items-center justify-center text-[8px] font-bold text-uin-green leading-none">
+            <span class="text-uin-gold text-[10px]">UIN</span>
+            <span>AR</span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-white font-bold text-lg tracking-wide leading-tight flex items-center gap-2 justify-center sm:justify-start">
+            SPORT CENTER
+            <span class="bg-uin-gold text-uin-dark text-[10px] px-2 py-0.5 rounded font-extrabold tracking-wider">UINAR</span>
+          </h1>
+          <p class="text-uin-goldlight text-xs font-medium">Universitas Islam Negeri Ar-Raniry Banda Aceh</p>
+        </div>
+      </div>
+      <div>
+        <a href="#booking-section" class="bg-uin-gold hover:bg-uin-goldlight text-uin-dark font-semibold px-4 py-2 rounded-lg text-xs md:text-sm shadow transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-1.5">
+          <i data-lucide="calendar-plus" class="w-4 h-4"></i> Booking Sekarang
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-gradient-to-r from-uin-green to-uin-greenlight text-white py-10 md:py-16 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
+        <span class="inline-block bg-uin-gold/20 text-uin-gold border border-uin-gold/40 text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">
+          Fasilitas Olahraga Islami & Modern
+        </span>
+        <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
+          Sewa Lapangan Badminton <span class="text-uin-gold">Sport Center</span> UINAR
+        </h2>
+        <p class="text-gray-200 text-sm md:text-base">
+          Gunakan fasilitas lapangan bulutangkis terbaik di Banda Aceh. Dilengkapi sistem reservasi otomatis dengan harga bersahabat untuk civitas akademika dan masyarakat umum.
+        </p>
+      </div>
+      
+      <!-- Jam Operasional -->
+      <div class="lg:col-span-5 bg-white text-gray-800 p-6 rounded-2xl shadow-2xl border-t-4 border-uin-gold">
+        <h3 class="font-bold text-lg text-uin-green border-b pb-2 flex items-center gap-2">
+          <i data-lucide="info" class="w-5 h-5 text-uin-gold"></i> Jam Operasional & Tarif
+        </h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          <li class="flex justify-between items-center border-b pb-1.5">
+            <span class="font-medium text-gray-600">Senin - Minggu</span>
+            <span class="font-semibold text-uin-green">08:00 - 22:00 WIB</span>
+          </li>
+          <li class="flex justify-between items-center border-b pb-1.5">
+            <span class="font-medium text-gray-600">Tarif Mahasiswa UIN</span>
+            <span class="font-semibold text-uin-green">Rp 25.000 / jam</span>
+          </li>
+          <li class="flex justify-between items-center border-b pb-1.5">
+            <span class="font-medium text-gray-600">Tarif Dosen/Staff</span>
+            <span class="font-semibold text-uin-green">Rp 35.000 / jam</span>
+          </li>
+          <li class="flex justify-between items-center">
+            <span class="font-medium text-gray-600">Tarif Umum</span>
+            <span class="font-semibold text-uin-green">Rp 50.000 / jam</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN BOOKING SYSTEM SECTION -->
+  <main id="booking-section" class="max-w-7xl mx-auto px-4 py-12 flex-grow">
+    
+    <!-- API Configuration Alert (Penting untuk Vercel) -->
+    <div id="api-alert" class="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-start gap-2">
+        <i data-lucide="settings" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+        <div>
+          <span class="font-bold block">Konfigurasi API Google Apps Script</span>
+          <span>Untuk menghubungkan form dengan Google Sheets Anda, masukkan URL Web App hasil deploy Anda di bawah ini.</span>
+        </div>
+      </div>
+      <div class="flex gap-2 w-full md:w-auto">
+        <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full md:w-80 p-2 text-xs border border-amber-300 rounded focus:ring-1 focus:ring-uin-green bg-white">
+        <button onclick="saveApiUrl()" class="bg-uin-green hover:bg-uin-greenlight text-white font-bold px-4 py-2 rounded text-xs shrink-0 transition-colors">Simpan</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- LEFT: Availability Checker -->
+      <section class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-lg border border-gray-100 space-y-6">
+        <div class="border-b border-gray-100 pb-4">
+          <h3 class="text-xl font-bold text-uin-green flex items-center gap-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-uin-gold"></i> 1. Pilih Jadwal & Lapangan
+          </h3>
+          <p class="text-xs text-gray-500 mt-1">Cek ketersediaan jam secara realtime sebelum mengisi form.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Pilih Lapangan</label>
+            <div class="relative">
+              <select id="select-court" onchange="checkAvailability()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-uin-green focus:border-uin-green p-3 pl-10 appearance-none">
+                <option value="Lapangan Badminton I" selected>Lapangan Badminton I</option>
+                <option value="Lapangan Badminton II">Lapangan Badminton II</option>
+                <option value="Lapangan Badminton III">Lapangan Badminton III</option>
+              </select>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                <i data-lucide="map-pin" class="w-4 h-4 text-uin-green"></i>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">Pilih Tanggal Main</label>
+            <div class="relative">
+              <input type="date" id="select-date" onchange="checkAvailability()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-uin-green focus:border-uin-green p-3 pl-10">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                <i data-lucide="calendar-days" class="w-4 h-4 text-uin-green"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slots Container -->
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Ketersediaan Jam</span>
+            <span class="text-xs text-uin-green font-medium flex items-center gap-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span> Tersedia
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block ml-2"></span> Terisi
+            </span>
+          </div>
+          
+          <div id="schedule-loader" class="hidden flex flex-col items-center justify-center py-10 space-y-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-uin-green"></div>
+            <p class="text-xs text-gray-500">Menghubungi Google Sheets...</p>
+          </div>
+
+          <div id="slots-grid" class="grid grid-cols-3 gap-2.5">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Form Booking -->
+      <section class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+        <div class="border-b border-gray-100 pb-4 mb-6">
+          <h3 class="text-xl font-bold text-uin-green flex items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5 text-uin-gold"></i> 2. Formulir Data Penyewa
+          </h3>
+          <p class="text-xs text-gray-500 mt-1">Lengkapi data di bawah ini untuk memesan lapangan.</p>
+        </div>
+
+        <form id="form-booking" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <input type="hidden" name="lapangan" id="form-lapangan-hidden">
+          <input type="hidden" name="tanggalMain" id="form-tanggal-hidden">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap Pemesan <span class="text-red-500">*</span></label>
+              <input type="text" name="nama" required placeholder="Contoh: Muhammad Rafiqi" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+            </div>
+            
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+              <select name="kategori" id="form-kategori" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+                <option value="Mahasiswa UIN">Mahasiswa UIN Ar-Raniry</option>
+                <option value="Dosen/Staff UIN">Dosen/Staff UIN Ar-Raniry</option>
+                <option value="Umum">Masyarakat Umum</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Nomor WhatsApp Aktif <span class="text-red-500">*</span></label>
+              <input type="tel" name="whatsapp" required placeholder="Contoh: 081234567890" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Mulai <span class="text-red-500">*</span></label>
+                <select name="jamMulai" id="form-jam-mulai" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Selesai <span class="text-red-500">*</span></label>
+                <select name="jamSelesai" id="form-jam-selesai" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn" class="w-full bg-uin-green hover:bg-uin-greenlight text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
+            <span>Proses Reservasi Lapangan</span>
+          </button>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- RECEIPT MODAL -->
+  <div id="receipt-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border-t-8 border-uin-gold relative">
+      <div class="bg-uin-green p-6 text-white text-center relative">
+        <button onclick="closeModal()" class="absolute top-4 right-4 text-white hover:text-uin-gold">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center border-2 border-uin-gold mb-3 shadow">
+          <i data-lucide="receipt" class="w-8 h-8 text-uin-green"></i>
+        </div>
+        <h3 class="font-extrabold text-xl tracking-wide">STRUK BOOKING DIGITAL</h3>
+        <p class="text-uin-goldlight text-xs font-medium">Sport Center UIN Ar-Raniry Banda Aceh</p>
+      </div>
+
+      <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto" id="receipt-content"></div>
+
+      <div class="p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+        <button onclick="window.print()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-1.5">
+          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Struk
+        </button>
+        <a id="whatsapp-confirm-btn" target="_blank" class="flex-[1.5] bg-uin-green hover:bg-uin-greenlight text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-1.5 shadow">
+          <i data-lucide="send" class="w-4 h-4 text-uin-gold"></i> Kirim ke WhatsApp Admin
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM ALERT -->
+  <div id="custom-alert" class="hidden fixed top-5 right-5 z-50 bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
+    <i data-lucide="alert-triangle" class="w-6 h-6 shrink-0 text-white"></i>
+    <div>
+      <h5 class="font-bold text-sm">Kesalahan</h5>
+      <p id="alert-text" class="text-xs text-red-100"></p>
+    </div>
+    <button onclick="hideAlert()" class="text-white hover:text-gray-200 ml-auto">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-uin-dark text-gray-400 py-8 border-t-4 border-uin-green text-xs md:text-sm">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p>&copy; 2026 Universitas Islam Negeri Ar-Raniry Banda Aceh. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    const OPERATIONAL_HOURS = [
+      '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+      '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
+    ];
+
+    let currentlyBookedSlots = [];
+    let APP_SCRIPT_URL = localStorage.getItem('UINAR_API_URL') || '';
+
+    window.onload = function() {
+      // Inisialisasi input URL di Alert Box jika ada
+      if (APP_SCRIPT_URL) {
+        document.getElementById('api-url-input').value = APP_SCRIPT_URL;
+      }
+
+      const today = new Date();
+      const formattedToday = today.toISOString().split('T')[0];
+      document.getElementById('select-date').value = formattedToday;
+      document.getElementById('form-tanggal-hidden').value = formattedToday;
+      document.getElementById('form-lapangan-hidden').value = document.getElementById('select-court').value;
+      
+      checkAvailability();
+    };
+
+    function saveApiUrl() {
+      const url = document.getElementById('api-url-input').value.trim();
+      if (!url) {
+        showAlert('Masukkan URL Google Apps Script yang valid.');
+        return;
+      }
+      localStorage.setItem('UINAR_API_URL', url);
+      APP_SCRIPT_URL = url;
+      showAlert('API Google Apps Script berhasil disimpan. Memuat ulang jadwal...');
+      checkAvailability();
+    }
+
+    /**
+     * Memanggil API Backend Apps Script dengan Fetch
+     */
+    async function checkAvailability() {
+      const court = document.getElementById('select-court').value;
+      const date = document.getElementById('select-date').value;
+      
+      document.getElementById('form-lapangan-hidden').value = court;
+      document.getElementById('form-tanggal-hidden').value = date;
+
+      if (!date) return;
+
+      // Sembunyikan Grid & Tampilkan Loading
+      document.getElementById('slots-grid').classList.add('hidden');
+      document.getElementById('schedule-loader').classList.remove('hidden');
+
+      // Gunakan Simulasi jika API Key Google Apps Script belum diset
+      if (!APP_SCRIPT_URL) {
+        console.log("Menggunakan simulasi lokal (API URL kosong).");
+        // Berikan contoh data sibuk untuk simulasi
+        currentlyBookedSlots = ["10:00", "11:00", "16:00", "17:00"];
+        setTimeout(() => {
+          renderSlotsGrid();
+          populateTimeSelectors();
+          document.getElementById('schedule-loader').classList.add('hidden');
+          document.getElementById('slots-grid').classList.remove('hidden');
+        }, 500);
+        return;
+      }
+
+      try {
+        const fetchUrl = `${APP_SCRIPT_URL}?date=${encodeURIComponent(date)}&court=${encodeURIComponent(court)}`;
+        const response = await fetch(fetchUrl);
+        const result = await response.json();
+
+        if (result.success) {
+          currentlyBookedSlots = result.bookedSlots || [];
+        } else {
+          showAlert(result.error || 'Gagal mengecek ketersediaan.');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('Gagal menghubungi server Google Sheets. Pastikan URL Web App valid dan CORS aktif.');
+      } finally {
+        renderSlotsGrid();
+        populateTimeSelectors();
+        document.getElementById('schedule-loader').classList.add('hidden');
+        document.getElementById('slots-grid').classList.remove('hidden');
+      }
+    }
+
+    function renderSlotsGrid() {
+      const grid = document.getElementById('slots-grid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < OPERATIONAL_HOURS.length - 1; i++) {
+        const currentSlot = OPERATIONAL_HOURS[i];
+        const nextSlot = OPERATIONAL_HOURS[i+1];
+        const displayLabel = `${currentSlot}-${nextSlot}`;
+        const isBooked = currentlyBookedSlots.includes(currentSlot);
+
+        const button = document.createElement('div');
+        button.className = `p-3 rounded-xl border text-center text-xs font-semibold shadow-sm transition-all flex flex-col justify-center items-center gap-1`;
+        
+        if (isBooked) {
+          button.className += ' bg-red-50 border-red-200 text-red-700';
+          button.innerHTML = `
+            <span>${displayLabel}</span>
+            <span class="text-[9px] font-bold bg-red-200 px-1.5 py-0.5 rounded uppercase">Full</span>
+          `;
+        } else {
+          button.className += ' bg-green-50 border-green-200 text-green-800 hover:scale-105 cursor-pointer';
+          button.innerHTML = `
+            <span>${displayLabel}</span>
+            <span class="text-[9px] font-bold bg-green-200 px-1.5 py-0.5 rounded uppercase text-green-700">Ready</span>
+          `;
+          button.addEventListener('click', () => {
+            document.getElementById('form-jam-mulai').value = currentSlot;
+            document.getElementById('form-jam-selesai').value = nextSlot;
+          });
+        }
+        grid.appendChild(button);
+      }
+    }
+
+    function populateTimeSelectors() {
+      const startSelector = document.getElementById('form-jam-mulai');
+      const endSelector = document.getElementById('form-jam-selesai');
+      
+      const currentStartVal = startSelector.value;
+      const currentEndVal = endSelector.value;
+
+      startSelector.innerHTML = '';
+      endSelector.innerHTML = '';
+
+      for (let i = 0; i < OPERATIONAL_HOURS.length - 1; i++) {
+        const time = OPERATIONAL_HOURS[i];
+        const option = document.createElement('option');
+        option.value = time;
+        option.textContent = `${time} WIB`;
+        
+        if (currentlyBookedSlots.includes(time)) {
+          option.disabled = true;
+          option.textContent += ' (Penuh)';
+        }
+        startSelector.appendChild(option);
+      }
+
+      for (let i = 1; i < OPERATIONAL_HOURS.length; i++) {
+        const time = OPERATIONAL_HOURS[i];
+        const option = document.createElement('option');
+        option.value = time;
+        option.textContent = `${time} WIB`;
+        endSelector.appendChild(option);
+      }
+
+      if (currentStartVal && startSelector.querySelector(`option[value="${currentStartVal}"]:not([disabled])`)) {
+        startSelector.value = currentStartVal;
+      } else {
+        const firstAvailable = startSelector.querySelector('option:not([disabled])');
+        if (firstAvailable) startSelector.value = firstAvailable.value;
+      }
+
+      if (currentEndVal) {
+        endSelector.value = currentEndVal;
+      } else {
+        const startIdx = OPERATIONAL_HOURS.indexOf(startSelector.value);
+        if (startIdx !== -1 && startIdx + 1 < OPERATIONAL_HOURS.length) {
+          endSelector.value = OPERATIONAL_HOURS[startIdx + 1];
+        }
+      }
+    }
+
+    /**
+     * Submit Booking ke Google Apps Script via POST
+     */
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const form = document.getElementById('form-booking');
+      const submitBtn = document.getElementById('submit-btn');
+      
+      const startHour = parseInt(form.jamMulai.value.split(':')[0], 10);
+      const endHour = parseInt(form.jamSelesai.value.split(':')[0], 10);
+      
+      if (endHour <= startHour) {
+        showAlert('Waktu selesai harus lebih lambat dari waktu mulai.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+        <span>Memproses di Server UINAR...</span>
+      `;
+
+      const bookingData = {
+        lapangan: form.lapangan.value,
+        tanggalMain: form.tanggalMain.value,
+        nama: form.nama.value,
+        kategori: form.kategori.value,
+        whatsapp: form.whatsapp.value,
+        jamMulai: form.jamMulai.value,
+        jamSelesai: form.jamSelesai.value
+      };
+
+      // Simulasi lokal jika URL Web App belum diset
+      if (!APP_SCRIPT_URL) {
+        setTimeout(() => {
+          const randId = Math.floor(1000 + Math.random() * 9000);
+          const durasi = endHour - startHour;
+          let baseTarif = 50000;
+          if (bookingData.kategori === 'Mahasiswa UIN') baseTarif = 25000;
+          else if (bookingData.kategori === 'Dosen/Staff UIN') baseTarif = 35000;
+          const totalBiaya = baseTarif * durasi;
+
+          const mockResult = {
+            success: true,
+            bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${randId}`,
+            nama: bookingData.nama,
+            kategori: bookingData.kategori,
+            lapangan: bookingData.lapangan,
+            tanggalMain: bookingData.tanggalMain,
+            jam: `${bookingData.jamMulai} - ${bookingData.jamSelesai} WIB`,
+            durasi: `${durasi} Jam`,
+            totalBiaya: 'Rp ' + totalBiaya.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+            status: 'Menunggu Pembayaran (Konfirmasi ke Pengelola)'
+          };
+          
+          showReceiptModal(mockResult);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i><span>Proses Reservasi Lapangan</span>`;
+          form.reset();
+        }, 1000);
+        return;
+      }
+
+      try {
+        const response = await fetch(APP_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Mode No-CORS aman untuk menyimpan data ke GAS
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookingData)
+        });
+
+        // Catatan: Mode no-cors mengembalikan tipe respon "opaque" (tanpa body pembacaan langsung).
+        // Kita berasumsi proses berhasil jika tidak ada error network, lalu mengonfirmasi ketersediaan terbaru.
+        const mockEstPrice = (endHour - startHour) * (bookingData.kategori === 'Mahasiswa UIN' ? 25000 : bookingData.kategori === 'Dosen/Staff UIN' ? 35000 : 50000);
+        const successFallback = {
+          success: true,
+          bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${Math.floor(1000 + Math.random()*9000)}`,
+          nama: bookingData.nama,
+          kategori: bookingData.kategori,
+          lapangan: bookingData.lapangan,
+          tanggalMain: bookingData.tanggalMain,
+          jam: `${bookingData.jamMulai} - ${bookingData.jamSelesai} WIB`,
+          durasi: `${endHour - startHour} Jam`,
+          totalBiaya: 'Rp ' + mockEstPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+        };
+
+        showReceiptModal(successFallback);
+        form.reset();
+        checkAvailability();
+
+      } catch (err) {
+        console.error(err);
+        showAlert('Gagal melakukan pendaftaran. Silakan cek koneksi internet Anda.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
+          <span>Proses Reservasi Lapangan</span>
+        `;
+      }
+    }
+
+    function showReceiptModal(data) {
+      const modal = document.getElementById('receipt-modal');
+      const content = document.getElementById('receipt-content');
+      
+      content.innerHTML = `
+        <div class="text-center pb-2 border-b border-dashed border-gray-300">
+          <p class="text-xs text-gray-500">Nomor Registrasi Unik</p>
+          <p class="text-lg font-mono font-bold text-uin-green">${data.bookingId}</p>
+        </div>
+        <div class="space-y-3 py-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Nama Pemesan</span>
+            <span class="font-semibold">${data.nama}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Kategori</span>
+            <span class="font-semibold">${data.kategori}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Lapangan</span>
+            <span class="font-semibold text-uin-green">${data.lapangan}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Tanggal Main</span>
+            <span class="font-semibold">${data.tanggalMain}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Waktu</span>
+            <span class="font-semibold">${data.jam}</span>
+          </div>
+          <div class="flex justify-between pt-2 border-t border-dashed border-gray-200">
+            <span class="font-bold">Estimasi Biaya</span>
+            <span class="text-lg font-extrabold text-uin-green">${data.totalBiaya}</span>
+          </div>
+        </div>
+      `;
+
+      const waAdminNumber = "6282212345678"; 
+      const textMessage = encodeURIComponent(
+        `Halo Admin Sport Center UIN Ar-Raniry.\nSaya ingin konfirmasi booking:\n\n` +
+        `ID: ${data.bookingId}\n` +
+        `Nama: ${data.nama}\n` +
+        `Lapangan: ${data.lapangan}\n` +
+        `Tanggal: ${data.tanggalMain}\n` +
+        `Waktu: ${data.jam}\n` +
+        `Estimasi Biaya: ${data.totalBiaya}\n\nTerima kasih!`
+      );
+      document.getElementById('whatsapp-confirm-btn').href = `https://wa.me/${waAdminNumber}?text=${textMessage}`;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('receipt-modal').classList.add('hidden');
+    }
+
+    function showAlert(msg) {
+      const alertBox = document.getElementById('custom-alert');
+      document.getElementById('alert-text').textContent = msg;
+      alertBox.classList.remove('hidden');
+      setTimeout(() => hideAlert(), 5000);
+    }
+
+    function hideAlert() {
+      document.getElementById('custom-alert').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
