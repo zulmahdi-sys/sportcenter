@@ -186,13 +186,13 @@
           </div>
         </div>
 
-        <!-- Slots Container -->
+        <!-- Slots Grid -->
         <div>
           <div class="flex justify-between items-center mb-3">
             <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Ketersediaan Jam</span>
             <span class="text-xs text-uin-green font-medium flex items-center gap-1">
               <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span> Tersedia
-              <span class="w-2.5 h-2.5 rounded-full bg-red-600 inline-block ml-2"></span> Terisi (Full)
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block ml-2"></span> Terisi
             </span>
           </div>
           
@@ -244,19 +244,21 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Mulai <span class="text-red-500">*</span></label>
-                <select name="jamMulai" id="form-jam-mulai" onchange="updateEndSelector()" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+                <select name="jamMulai" id="form-jam-mulai" onchange="updateEndHourOptions()" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
                 </select>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Selesai <span class="text-red-500">*</span></label>
-                <select name="jamSelesai" id="form-jam-selesai" onchange="calculateDurationPreview()" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+                <select name="jamSelesai" id="form-jam-selesai" onchange="updateDurationPreview()" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
                 </select>
               </div>
             </div>
           </div>
 
-          <!-- Real-Time Duration Display (No Price Estimation Panel) -->
-          <div id="duration-preview-text" class="mt-2 text-center"></div>
+          <!-- Real-time Duration Preview Panel (Tepat di atas tombol) -->
+          <div id="duration-preview-container" class="bg-uin-accent border border-uin-green/20 rounded-xl p-3 text-center">
+            <span class="text-xs font-bold text-uin-green" id="duration-preview-text">Durasi Sewa: 0 Jam</span>
+          </div>
 
           <button type="submit" id="submit-btn" class="w-full bg-uin-green hover:bg-uin-greenlight text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
@@ -580,7 +582,12 @@
   <script>
     lucide.createIcons();
 
-    // Nilai default jika API belum disinkronkan
+    // Nilai jam operasional default langsung diisi (Fail-safe agar Ketersediaan Jam selalu muncul instan)
+    let OPERATIONAL_HOURS = [
+      '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+      '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
+    ];
+
     let activeSettings = {
       jam_mulai: "08:00",
       jam_selesai: "22:00",
@@ -589,7 +596,6 @@
       tarif_umum: "50000"
     };
 
-    let OPERATIONAL_HOURS = [];
     let currentlyBookedSlots = [];
     let APP_SCRIPT_URL = localStorage.getItem('UINAR_API_URL') || '';
     
@@ -682,7 +688,6 @@
             .then(res => { if(res.success) successCb(res); else failureCb(new Error(res.error)); })
             .catch(err => failureCb(err));
         } else {
-          // Simulasi Simpan Lokal
           setTimeout(() => {
             const startHour = parseInt(bookingData.jamMulai.split(':')[0]);
             const endHour = parseInt(bookingData.jamSelesai.split(':')[0]);
@@ -821,6 +826,9 @@
      * Memuat pengaturan jam & tarif dinamis
      */
     function loadSettingsAndInitialize() {
+      // Pemuatan default langsung dijalankan terlebih dahulu
+      applyApplicationSettings();
+
       Backend.getSettings(
         function(settings) {
           if (settings && settings.jam_mulai) {
@@ -853,11 +861,17 @@
       }
 
       // Input nilai set di panel admin jika admin terbuka
-      document.getElementById('set-jam-mulai').value = activeSettings.jam_mulai;
-      document.getElementById('set-jam-selesai').value = activeSettings.jam_selesai;
-      document.getElementById('set-tarif-mhs').value = activeSettings.tarif_mahasiswa;
-      document.getElementById('set-tarif-dosen').value = activeSettings.tarif_dosen;
-      document.getElementById('set-tarif-umum').value = activeSettings.tarif_umum;
+      const setMulai = document.getElementById('set-jam-mulai');
+      const setSelesai = document.getElementById('set-jam-selesai');
+      const setMhs = document.getElementById('set-tarif-mhs');
+      const setDosen = document.getElementById('set-tarif-dosen');
+      const setUmum = document.getElementById('set-tarif-umum');
+
+      if (setMulai) setMulai.value = activeSettings.jam_mulai;
+      if (setSelesai) setSelesai.value = activeSettings.jam_selesai;
+      if (setMhs) setMhs.value = activeSettings.tarif_mahasiswa;
+      if (setDosen) setDosen.value = activeSettings.tarif_dosen;
+      if (setUmum) setUmum.value = activeSettings.tarif_umum;
     }
 
     function saveApiUrl() {
@@ -913,23 +927,25 @@
         const isBooked = currentlyBookedSlots.includes(currentSlot);
 
         const button = document.createElement('div');
+        button.className = `p-3 rounded-xl border text-center text-xs font-semibold shadow-sm transition-all flex flex-col justify-center items-center gap-1`;
         
         if (isBooked) {
-          // RED ALERT GRID: Berwarna merah cerah, berstatus "Full", cursor dimatikan, tidak bisa diclick
-          button.className = `p-3 rounded-xl border text-center text-xs font-semibold shadow-inner flex flex-col justify-center items-center gap-1 bg-red-600 border-red-700 text-white cursor-not-allowed opacity-95`;
+          button.className += ' bg-red-100 border-red-300 text-red-700 cursor-not-allowed opacity-90';
           button.innerHTML = `
             <span>${displayLabel}</span>
-            <span class="text-[9px] font-bold bg-red-800/80 px-2 py-0.5 rounded uppercase text-red-100">Full</span>
+            <span class="text-[9px] font-bold bg-red-200 px-1.5 py-0.5 rounded uppercase">Full</span>
           `;
         } else {
-          button.className = `p-3 rounded-xl border text-center text-xs font-semibold shadow-sm transition-all flex flex-col justify-center items-center gap-1 bg-green-50 border-green-200 text-green-800 hover:scale-105 cursor-pointer`;
+          button.className += ' bg-green-50 border-green-200 text-green-800 hover:scale-105 cursor-pointer';
           button.innerHTML = `
             <span>${displayLabel}</span>
             <span class="text-[9px] font-bold bg-green-200 px-1.5 py-0.5 rounded uppercase text-green-700">Ready</span>
           `;
           button.addEventListener('click', () => {
             document.getElementById('form-jam-mulai').value = currentSlot;
-            updateEndSelector(nextSlot);
+            updateEndHourOptions();
+            document.getElementById('form-jam-selesai').value = nextSlot;
+            updateDurationPreview();
           });
         }
         grid.appendChild(button);
@@ -938,11 +954,12 @@
 
     function populateTimeSelectors() {
       const startSelector = document.getElementById('form-jam-mulai');
+      const endSelector = document.getElementById('form-jam-selesai');
+      
       const currentStartVal = startSelector.value;
 
       startSelector.innerHTML = '';
 
-      // Populate Jam Mulai (Hanya yang tidak ter-booking penuh)
       for (let i = 0; i < OPERATIONAL_HOURS.length - 1; i++) {
         const time = OPERATIONAL_HOURS[i];
         const option = document.createElement('option');
@@ -963,42 +980,37 @@
         if (firstAvailable) startSelector.value = firstAvailable.value;
       }
 
-      // Inisialisasi/update dropdown jam selesai secara otomatis
-      updateEndSelector();
+      updateEndHourOptions();
     }
 
-    /**
-     * ANTI-STRADDLE DROPDOWN SELECTOR:
-     * Menghitung & menonaktifkan jam selesai yang melompati jam bentrok yang sudah dipesan.
-     */
-    function updateEndSelector(preferredEndVal) {
+    // Anti-Straddle Dropdown Selector Logic (Pencegah Tumpang Tindih / Bentrok)
+    function updateEndHourOptions() {
       const startSelector = document.getElementById('form-jam-mulai');
       const endSelector = document.getElementById('form-jam-selesai');
-      const startVal = startSelector.value;
+      const selectedStart = startSelector.value;
+      
+      if (!selectedStart) return;
 
+      const startIdx = OPERATIONAL_HOURS.indexOf(selectedStart);
+      const currentEndVal = endSelector.value;
       endSelector.innerHTML = '';
-      if (!startVal) return;
 
-      const startIdx = OPERATIONAL_HOURS.indexOf(startVal);
+      let hasConflictAhead = false;
 
-      // Cari indeks jam bentrok terdekat setelah jam mulai
-      let firstBentrokIdx = -1;
-      for (let i = startIdx; i < OPERATIONAL_HOURS.length - 1; i++) {
-        if (currentlyBookedSlots.includes(OPERATIONAL_HOURS[i])) {
-          firstBentrokIdx = i;
-          break;
-        }
-      }
-
-      // Daftarkan jam selesai yang mungkin
       for (let i = startIdx + 1; i < OPERATIONAL_HOURS.length; i++) {
         const time = OPERATIONAL_HOURS[i];
+        const prevTime = OPERATIONAL_HOURS[i - 1];
+        
+        // Jika salah satu jam di dalam rentang sudah ter-booking, batalkan seluruh jam selesai berikutnya
+        if (currentlyBookedSlots.includes(prevTime)) {
+          hasConflictAhead = true;
+        }
+
         const option = document.createElement('option');
         option.value = time;
         option.textContent = `${time} WIB`;
 
-        // Jika jam selesai ini melompati atau menabrak jadwal yang sudah penuh
-        if (firstBentrokIdx !== -1 && i > firstBentrokIdx) {
+        if (hasConflictAhead) {
           option.disabled = true;
           option.textContent += ' (Bentrok)';
         }
@@ -1006,51 +1018,34 @@
         endSelector.appendChild(option);
       }
 
-      // Terapkan nilai terpilih yang paling logis
-      if (preferredEndVal && endSelector.querySelector(`option[value="${preferredEndVal}"]:not([disabled])`)) {
-        endSelector.value = preferredEndVal;
-      } else {
-        const firstAvailableEnd = endSelector.querySelector('option:not([disabled])');
-        if (firstAvailableEnd) endSelector.value = firstAvailableEnd.value;
+      // Pilih opsi pertama yang tersedia/tidak disabled secara aman
+      const validOption = endSelector.querySelector('option:not([disabled])');
+      if (validOption) {
+        endSelector.value = validOption.value;
       }
 
-      calculateDurationPreview();
+      updateDurationPreview();
     }
 
-    function calculateDurationPreview() {
+    function updateDurationPreview() {
       const startVal = document.getElementById('form-jam-mulai').value;
       const endVal = document.getElementById('form-jam-selesai').value;
       const durationText = document.getElementById('duration-preview-text');
-      const submitBtn = document.getElementById('submit-btn');
 
       if (!startVal || !endVal) {
-        durationText.textContent = "";
+        durationText.textContent = "Durasi Sewa: 0 Jam";
         return;
       }
 
       const startHour = parseInt(startVal.split(':')[0], 10);
       const endHour = parseInt(endVal.split(':')[0], 10);
+      const duration = endHour - startHour;
 
-      if (endHour <= startHour) {
-        durationText.textContent = "Jam selesai tidak valid.";
-        durationText.className = "text-xs text-red-500 font-semibold text-center mb-3";
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50');
-        return;
+      if (duration > 0) {
+        durationText.textContent = `Durasi Sewa: ${duration} Jam`;
+      } else {
+        durationText.textContent = "Durasi Sewa: 0 Jam";
       }
-
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('opacity-50');
-
-      const durasi = endHour - startHour;
-      durationText.className = "text-xs text-uin-green font-bold text-center mb-4 bg-uin-accent py-2.5 px-4 rounded-xl border border-uin-green/10";
-      durationText.innerHTML = `
-        <div class="flex items-center justify-center gap-1.5">
-          <i data-lucide="clock" class="w-4 h-4 text-uin-gold shrink-0"></i>
-          <span>Durasi Main Terpilih: <strong class="text-sm font-extrabold text-uin-green">${durasi} Jam</strong> (${startVal} - ${endVal})</span>
-        </div>
-      `;
-      lucide.createIcons();
     }
 
     function handleFormSubmit(e) {
@@ -1180,6 +1175,8 @@
     function closeModal() {
       document.getElementById('receipt-modal').classList.add('hidden');
     }
+
+    // --- LOGIKA ADMIN PANEL & DASHBOARD ---
 
     function toggleAdminView() {
       const isVisible = !document.getElementById('admin-section').classList.contains('hidden');
@@ -1388,7 +1385,6 @@
       );
     }
 
-    // --- FITUR SIMPAN PENGATURAN ADMIN ---
     function saveApplicationSettings() {
       const jMulai = document.getElementById('set-jam-mulai').value;
       const jSelesai = document.getElementById('set-jam-selesai').value;
@@ -1437,6 +1433,8 @@
         }
       );
     }
+
+    // --- LOGIKA REKAP BULANAN & CETAK LAPORAN ---
 
     function populateReportMonthSelect() {
       const select = document.getElementById('report-month-select');
