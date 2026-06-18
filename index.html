@@ -1543,10 +1543,3 @@
   </script>
 </body>
 </html>
-```
-eof
-
-### Ringkasan Peningkatan:
-1. **Pencegahan Tabrakan Mutlak**: `updateEndSelector()` sekarang memindai jadwal ke depan setelah jam mulai yang dipilih pelanggan. Jika ada waktu bentrok di tengah-tengah rentang sewa, semua pilihan jam selesai setelah bentrok tersebut secara otomatis didisable dengan label `(Bentrok)`.
-2. **Visual Ketersediaan Jelas**: Grid yang sudah dipesan berubah menjadi merah cerah (`bg-red-600`) berlabel "Full" dan tidak bisa diinteraksi.
-3. **Penyajian Sederhana Tanpa Harga**: Panel rincian harga sewa dihilangkan sepenuhnya, hanya menyisakan panel durasi waktu yang sangat rapi tepat di atas tombol reservasi.
