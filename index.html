@@ -32,6 +32,32 @@
       }
     }
   </script>
+  <style>
+    /* Sembunyikan elemen non-cetak saat mencetak */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-receipt-section, #print-receipt-section * {
+        visibility: visible;
+      }
+      #print-receipt-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      #print-report-section, #print-report-section * {
+        visibility: visible;
+      }
+      #print-report-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
@@ -53,16 +79,19 @@
           <p class="text-uin-goldlight text-xs font-medium">Universitas Islam Negeri Ar-Raniry Banda Aceh</p>
         </div>
       </div>
-      <div>
-        <a href="#booking-section" class="bg-uin-gold hover:bg-uin-goldlight text-uin-dark font-semibold px-4 py-2 rounded-lg text-xs md:text-sm shadow transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-1.5">
-          <i data-lucide="calendar-plus" class="w-4 h-4"></i> Booking Sekarang
+      <div class="flex items-center gap-2">
+        <a href="#booking-section" onclick="showBookingTab()" class="bg-uin-gold hover:bg-uin-goldlight text-uin-dark font-semibold px-4 py-2 rounded-lg text-xs md:text-sm shadow transition-all duration-300 flex items-center gap-1.5">
+          <i data-lucide="calendar-plus" class="w-4 h-4"></i> Sewa Lapangan
         </a>
+        <button id="nav-admin-btn" onclick="toggleAdminView()" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2 rounded-lg text-xs md:text-sm transition-all flex items-center gap-1.5 border border-white/20">
+          <i data-lucide="shield-check" class="w-4 h-4 text-uin-gold"></i> Panel Pengelola
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- HERO SECTION -->
-  <section class="relative bg-gradient-to-r from-uin-green to-uin-greenlight text-white py-10 md:py-16 overflow-hidden">
+  <!-- HERO SECTION (Sembunyikan saat Admin aktif) -->
+  <section id="hero-banner" class="relative bg-gradient-to-r from-uin-green to-uin-greenlight text-white py-10 md:py-16 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
       <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
         <span class="inline-block bg-uin-gold/20 text-uin-gold border border-uin-gold/40 text-xs px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">
@@ -103,8 +132,8 @@
     </div>
   </section>
 
-  <!-- MAIN BOOKING SYSTEM SECTION -->
-  <main id="booking-section" class="max-w-7xl mx-auto px-4 py-12 flex-grow">
+  <!-- CUSTOMER BOOKING VIEW -->
+  <main id="booking-section" class="max-w-7xl mx-auto px-4 py-12 flex-grow w-full">
     
     <!-- API Configuration Alert (Penting untuk Vercel) -->
     <div id="api-alert" class="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
@@ -237,51 +266,263 @@
     </div>
   </main>
 
-  <!-- RECEIPT MODAL -->
-  <div id="receipt-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border-t-8 border-uin-gold relative">
-      <div class="bg-uin-green p-6 text-white text-center relative">
-        <button onclick="closeModal()" class="absolute top-4 right-4 text-white hover:text-uin-gold">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-        <div class="w-16 h-16 bg-white rounded-full mx-auto flex items-center justify-center border-2 border-uin-gold mb-3 shadow">
-          <i data-lucide="receipt" class="w-8 h-8 text-uin-green"></i>
+  <!-- ADMIN LOGIN & DASHBOARD VIEW -->
+  <main id="admin-section" class="hidden max-w-7xl mx-auto px-4 py-12 flex-grow w-full">
+    <!-- Admin Login Panel -->
+    <div id="admin-login-card" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100 text-center">
+      <div class="w-16 h-16 bg-uin-green rounded-full mx-auto flex items-center justify-center border-2 border-uin-gold mb-4">
+        <i data-lucide="lock" class="w-8 h-8 text-uin-gold"></i>
+      </div>
+      <h3 class="text-xl font-bold text-uin-green mb-1">Login Pengelola Sport Center</h3>
+      <p class="text-xs text-gray-500 mb-6">Gunakan akun admin Anda untuk mengelola jadwal dan laporan.</p>
+      
+      <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Username</label>
+          <input type="text" id="admin-username" required placeholder="admin" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
         </div>
-        <h3 class="font-extrabold text-xl tracking-wide">STRUK BOOKING DIGITAL</h3>
-        <p class="text-uin-goldlight text-xs font-medium">Sport Center UIN Ar-Raniry Banda Aceh</p>
-      </div>
-
-      <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto" id="receipt-content"></div>
-
-      <div class="p-6 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
-        <button onclick="window.print()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-1.5">
-          <i data-lucide="printer" class="w-4 h-4"></i> Cetak Struk
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
+          <input type="password" id="admin-password" required placeholder="••••••••" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-uin-green focus:border-uin-green">
+        </div>
+        <button type="submit" id="login-btn" class="w-full bg-uin-green hover:bg-uin-greenlight text-white font-bold py-3 px-6 rounded-xl transition-all">
+          Masuk ke Dashboard
         </button>
-        <a id="whatsapp-confirm-btn" target="_blank" class="flex-[1.5] bg-uin-green hover:bg-uin-greenlight text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-1.5 shadow">
-          <i data-lucide="send" class="w-4 h-4 text-uin-gold"></i> Kirim ke WhatsApp Admin
-        </a>
+      </form>
+      <p class="text-[10px] text-gray-400 mt-4 italic">Hubungi IT Support UINAR jika Anda lupa kredensial.</p>
+    </div>
+
+    <!-- Admin Dashboard (Sembunyikan sebelum login) -->
+    <div id="admin-dashboard-panel" class="hidden space-y-8">
+      
+      <!-- Dashboard Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-uin-green flex items-center gap-2">
+            <i data-lucide="layout-dashboard" class="text-uin-gold"></i> Dashboard Pengelola
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">Sistem Pemantauan Sewa Lapangan Sport Center UIN Ar-Raniry</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="refreshAdminData()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition-all">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Refresh Data
+          </button>
+          <button onclick="handleAdminLogout()" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition-all">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar
+          </button>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
+            <i data-lucide="book-open" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase">Total Booking</p>
+            <h4 class="text-2xl font-extrabold text-gray-800" id="stat-total-booking">0</h4>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center">
+            <i data-lucide="wallet" class="w-6 h-6 text-amber-600"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase">Est. Pendapatan</p>
+            <h4 class="text-2xl font-extrabold text-gray-800" id="stat-total-revenue">Rp 0</h4>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6 text-red-600"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase">Belum Lunas</p>
+            <h4 class="text-2xl font-extrabold text-gray-800" id="stat-pending">0</h4>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-100 flex items-center gap-4">
+          <div class="w-12 h-12 rounded-lg bg-uin-accent flex items-center justify-center">
+            <i data-lucide="badge-check" class="w-6 h-6 text-uin-green"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 font-medium uppercase">Lunas</p>
+            <h4 class="text-2xl font-extrabold text-gray-800" id="stat-completed">0</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Booking Management Table (LEFT 8 COLS) -->
+        <div class="lg:col-span-8 bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
+              <i data-lucide="list" class="w-4 h-4 text-uin-green"></i> Semua Riwayat Reservasi
+            </h3>
+            <input type="text" id="admin-search" oninput="filterBookingsTable()" placeholder="Cari nama atau ID..." class="p-2 text-xs border rounded w-full sm:w-64 focus:ring-1 focus:ring-uin-green bg-gray-50">
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs md:text-sm">
+              <thead>
+                <tr class="bg-gray-100 text-gray-600 font-bold uppercase text-[10px] tracking-wider border-b">
+                  <th class="p-4">ID / Tanggal Main</th>
+                  <th class="p-4">Pemesan</th>
+                  <th class="p-4">Lapangan</th>
+                  <th class="p-4">Biaya</th>
+                  <th class="p-4 text-center">Status</th>
+                  <th class="p-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-bookings-rows" class="divide-y">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Monthly Recap & Printing Section (RIGHT 4 COLS) -->
+        <div class="lg:col-span-4 bg-white p-6 rounded-xl shadow border border-gray-100 space-y-6">
+          <div class="border-b pb-3">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+              <i data-lucide="bar-chart-2" class="w-5 h-5 text-uin-gold"></i> Rekapitulasi Laporan
+            </h3>
+            <p class="text-[11px] text-gray-500 mt-0.5">Analisis bulanan dan cetak laporan resmi.</p>
+          </div>
+
+          <!-- Month Selector -->
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1.5">Pilih Bulan & Tahun</label>
+              <select id="report-month-select" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <button onclick="previewMonthlyReport()" class="w-full bg-uin-green hover:bg-uin-greenlight text-white font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="eye" class="w-4 h-4"></i> Pratinjau Laporan
+            </button>
+            <button onclick="printMonthlyReport()" class="w-full bg-uin-gold hover:bg-uin-goldlight text-uin-dark font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm">
+              <i data-lucide="printer" class="w-4 h-4"></i> Cetak Laporan Bulanan
+            </button>
+          </div>
+
+          <!-- Monthly Mini Stats Graphic Preview -->
+          <div class="bg-uin-accent border border-uin-green/20 p-4 rounded-xl space-y-3">
+            <h4 class="text-xs font-bold text-uin-green flex items-center gap-1 uppercase">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Ringkasan Bulan Ini
+            </h4>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Total Transaksi</span>
+                <span class="font-bold text-gray-800" id="month-stat-count">0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Pemasukan Lunas</span>
+                <span class="font-bold text-uin-green" id="month-stat-revenue">Rp 0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Kategori Terbanyak</span>
+                <span class="font-bold text-gray-800" id="month-stat-top">N/A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- PRINT REPORT WRAPPER (HIDDEN ON SCREEN, ONLY VISIBLE ON PRINT) -->
+  <div id="print-report-section" class="hidden p-8 bg-white text-black font-serif text-sm">
+    <!-- Kop Surat Khas UIN Ar-Raniry -->
+    <div class="border-b-4 border-double border-black pb-4 text-center">
+      <h1 class="text-lg font-bold uppercase tracking-wide">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h1>
+      <h2 class="text-base font-bold uppercase tracking-wide">UNIVERSITAS ISLAM NEGERI AR-RANIRY BANDA ACEH</h2>
+      <h3 class="text-xl font-bold tracking-wider text-green-950">UNIT PELAKSANA TEKNIS (UPT) SPORT CENTER</h3>
+      <p class="text-xs italic">Jl. Syeikh Abdur Rauf Kopelma Darussalam, Banda Aceh, Kode Pos: 23111</p>
+    </div>
+
+    <!-- Judul Laporan -->
+    <div class="my-6 text-center">
+      <h4 class="text-base font-bold uppercase underline">LAPORAN REKAPITULASI RESERVASI LAPANGAN</h4>
+      <p class="text-xs mt-1">Periode: <span class="font-bold" id="print-report-period">-</span></p>
+    </div>
+
+    <!-- Tabel Laporan -->
+    <table class="w-full text-left border-collapse border border-black my-4 text-xs">
+      <thead>
+        <tr class="bg-gray-100 text-black border border-black">
+          <th class="border border-black p-2 font-bold">No</th>
+          <th class="border border-black p-2 font-bold">ID Booking</th>
+          <th class="border border-black p-2 font-bold">Pemesan</th>
+          <th class="border border-black p-2 font-bold">Kategori</th>
+          <th class="border border-black p-2 font-bold">Lapangan</th>
+          <th class="border border-black p-2 font-bold">Tanggal Main</th>
+          <th class="border border-black p-2 font-bold">Jam</th>
+          <th class="border border-black p-2 font-bold">Tarif</th>
+          <th class="border border-black p-2 font-bold">Status</th>
+        </tr>
+      </thead>
+      <tbody id="print-report-table-rows">
+        <!-- Filled dynamically -->
+      </tbody>
+    </table>
+
+    <!-- Total Ringkasan -->
+    <div class="flex justify-end my-4">
+      <div class="w-72 border border-black p-3 space-y-1.5 text-xs">
+        <div class="flex justify-between">
+          <span>Total Reservasi:</span>
+          <span class="font-bold" id="print-report-total-count">0</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Pemasukan Lunas:</span>
+          <span class="font-bold" id="print-report-total-revenue">Rp 0</span>
+        </div>
+        <div class="flex justify-between border-t border-black pt-1">
+          <span>Total Est. Pendapatan:</span>
+          <span class="font-bold" id="print-report-grand-total">Rp 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tanda Tangan -->
+    <div class="mt-12 flex justify-between text-xs">
+      <div>
+        <p>Mengetahui,</p>
+        <p class="font-bold">Kepala UPT Sport Center UINAR</p>
+        <br><br><br>
+        <p class="underline font-bold">...............................................</p>
+        <p>NIP. .......................................</p>
+      </div>
+      <div class="text-right">
+        <p>Banda Aceh, <span id="print-report-today-date">-</span></p>
+        <p class="font-bold">Petugas Administrasi</p>
+        <br><br><br>
+        <p class="underline font-bold">...............................................</p>
+        <p>Staf Pengelola UPT</p>
       </div>
     </div>
   </div>
 
-  <!-- CUSTOM ALERT -->
-  <div id="custom-alert" class="hidden fixed top-5 right-5 z-50 bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 max-w-sm">
-    <i data-lucide="alert-triangle" class="w-6 h-6 shrink-0 text-white"></i>
-    <div>
-      <h5 class="font-bold text-sm">Kesalahan</h5>
-      <p id="alert-text" class="text-xs text-red-100"></p>
+  <!-- PRINT RECEIPT WRAPPER (HIDDEN ON SCREEN, ONLY VISIBLE ON PRINT) -->
+  <div id="print-receipt-section" class="hidden p-8 bg-white text-black font-sans text-xs max-w-sm mx-auto border-2 border-black">
+    <div class="text-center pb-2 border-b border-dashed border-black">
+      <h3 class="font-extrabold text-sm tracking-wide">SPORT CENTER UIN AR-RANIRY</h3>
+      <p class="text-[10px]">Kopelma Darussalam Banda Aceh</p>
+      <p class="text-[9px] mt-1 italic">TANDA BUKTI RESERVASI LAPANGAN</p>
     </div>
-    <button onclick="hideAlert()" class="text-white hover:text-gray-200 ml-auto">
-      <i data-lucide="x" class="w-4 h-4"></i>
-    </button>
+    <div class="py-3 space-y-1.5" id="print-receipt-details">
+      <!-- Filled on fly before print -->
+    </div>
+    <div class="text-center pt-3 border-t border-dashed border-black text-[9px] italic">
+      <p>Terima kasih atas reservasi Anda.</p>
+      <p>Harap konfirmasi pembayaran ke WhatsApp Admin.</p>
+    </div>
   </div>
-
-  <!-- FOOTER -->
-  <footer class="bg-uin-dark text-gray-400 py-8 border-t-4 border-uin-green text-xs md:text-sm">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-      <p>&copy; 2026 Universitas Islam Negeri Ar-Raniry Banda Aceh. All Rights Reserved.</p>
-    </div>
-  </footer>
 
   <script>
     lucide.createIcons();
@@ -293,9 +534,251 @@
 
     let currentlyBookedSlots = [];
     let APP_SCRIPT_URL = localStorage.getItem('UINAR_API_URL') || '';
+    
+    // Admin & Booking data di memori
+    let isAdminLoggedIn = false;
+    let adminToken = '';
+    let allBookingsList = [];
+
+    // DB Lokal Simulasi (Saat dijalankan di Preview)
+    if (!window.localMockDb) {
+      window.localMockDb = {};
+    }
+    if (!window.localMockBookings) {
+      // Inisialisasi data booking simulasi awal agar di preview sudah terisi beberapa
+      window.localMockBookings = [
+        {
+          bookingId: "SC-20260618-1254",
+          tanggalBooking: "17 Juni 2026",
+          tanggalMainRaw: "2026-06-18",
+          tanggalMain: "18 Juni 2026",
+          jamMulai: "10:00",
+          jamSelesai: "11:00",
+          nama: "Teuku Ryan",
+          kategori: "Mahasiswa UIN",
+          whatsapp: "081269384910",
+          lapangan: "Lapangan Badminton I",
+          totalBiaya: 25000,
+          status: "Lunas"
+        },
+        {
+          bookingId: "SC-20260618-9382",
+          tanggalBooking: "18 Juni 2026",
+          tanggalMainRaw: "2026-06-18",
+          tanggalMain: "18 Juni 2026",
+          jamMulai: "16:00",
+          jamSelesai: "18:00",
+          nama: "Cut Mutia",
+          kategori: "Umum",
+          whatsapp: "085277123490",
+          lapangan: "Lapangan Badminton I",
+          totalBiaya: 100000,
+          status: "Pending"
+        },
+        {
+          bookingId: "SC-20260619-4821",
+          tanggalBooking: "18 Juni 2026",
+          tanggalMainRaw: "2026-06-19",
+          tanggalMain: "19 Juni 2026",
+          jamMulai: "14:00",
+          jamSelesai: "16:00",
+          nama: "Pak Darmawan",
+          kategori: "Dosen/Staff UIN",
+          whatsapp: "082388491200",
+          lapangan: "Lapangan Badminton II",
+          totalBiaya: 70000,
+          status: "Lunas"
+        }
+      ];
+    }
+
+    let isGAS = false;
+    try {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        isGAS = true;
+      }
+    } catch (e) {
+      isGAS = false;
+    }
+
+    // Adaptor Komunikasi API Terpadu (GAS / Mock)
+    const Backend = {
+      getBookedSlots: function(date, court, successCb, failureCb) {
+        if (isGAS) {
+          google.script.run
+            .withSuccessHandler(successCb)
+            .withFailureHandler(failureCb)
+            .getBookedSlots(date, court);
+        } else if (APP_SCRIPT_URL) {
+          const fetchUrl = `${APP_SCRIPT_URL}?action=getBookedSlots&date=${encodeURIComponent(date)}&court=${encodeURIComponent(court)}`;
+          fetch(fetchUrl)
+            .then(res => res.json())
+            .then(res => { if(res.success) successCb(res.bookedSlots); else failureCb(new Error(res.error)); })
+            .catch(err => failureCb(err));
+        } else {
+          // Mode Simulasi Lokal
+          const key = `${date}_${court}`;
+          const bookedFromMockList = window.localMockBookings
+            .filter(b => b.tanggalMainRaw === date && b.lapangan === court && b.status !== 'Batal')
+            .flatMap(b => {
+              const start = parseInt(b.jamMulai.split(':')[0]);
+              const end = parseInt(b.jamSelesai.split(':')[0]);
+              const slots = [];
+              for(let h=start; h<end; h++) {
+                slots.push(h < 10 ? `0${h}:00` : `${h}:00`);
+              }
+              return slots;
+            });
+          setTimeout(() => successCb(bookedFromMockList), 300);
+        }
+      },
+      submitBooking: function(bookingData, successCb, failureCb) {
+        if (isGAS) {
+          google.script.run
+            .withSuccessHandler(successCb)
+            .withFailureHandler(failureCb)
+            .submitBooking(bookingData);
+        } else if (APP_SCRIPT_URL) {
+          fetch(APP_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+          })
+          .then(() => {
+            const startHour = parseInt(bookingData.jamMulai.split(':')[0]);
+            const endHour = parseInt(bookingData.jamSelesai.split(':')[0]);
+            const price = (endHour - startHour) * (bookingData.kategori === 'Mahasiswa UIN' ? 25000 : bookingData.kategori === 'Dosen/Staff UIN' ? 35000 : 50000);
+            successCb({
+              success: true,
+              bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${Math.floor(1000 + Math.random()*9000)}`,
+              nama: bookingData.nama,
+              kategori: bookingData.kategori,
+              lapangan: bookingData.lapangan,
+              tanggalMain: bookingData.tanggalMain,
+              jam: `${bookingData.jamMulai} - ${bookingData.jamSelesai} WIB`,
+              durasi: `${endHour - startHour} Jam`,
+              totalBiaya: 'Rp ' + price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+              status: 'Pending'
+            });
+          })
+          .catch(err => failureCb(err));
+        } else {
+          // Simulasi Simpan Lokal
+          setTimeout(() => {
+            const startHour = parseInt(bookingData.jamMulai.split(':')[0]);
+            const endHour = parseInt(bookingData.jamSelesai.split(':')[0]);
+            const durasi = endHour - startHour;
+            let pricePer = 50000;
+            if (bookingData.kategori === 'Mahasiswa UIN') pricePer = 25000;
+            else if (bookingData.kategori === 'Dosen/Staff UIN') pricePer = 35000;
+            const total = pricePer * durasi;
+            
+            const newMock = {
+              bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${Math.floor(1000 + Math.random()*9000)}`,
+              tanggalBooking: "Hari Ini",
+              tanggalMainRaw: bookingData.tanggalMain,
+              tanggalMain: bookingData.tanggalMain,
+              jamMulai: bookingData.jamMulai,
+              jamSelesai: bookingData.jamSelesai,
+              nama: bookingData.nama,
+              kategori: bookingData.kategori,
+              whatsapp: bookingData.whatsapp,
+              lapangan: bookingData.lapangan,
+              totalBiaya: total,
+              status: 'Pending'
+            };
+            window.localMockBookings.push(newMock);
+            
+            successCb({
+              success: true,
+              bookingId: newMock.bookingId,
+              nama: newMock.nama,
+              kategori: newMock.kategori,
+              lapangan: newMock.lapangan,
+              tanggalMain: newMock.tanggalMain,
+              jam: `${newMock.jamMulai} - ${newMock.jamSelesai} WIB`,
+              durasi: `${durasi} Jam`,
+              totalBiaya: 'Rp ' + total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+              status: 'Pending'
+            });
+          }, 600);
+        }
+      },
+      adminLogin: function(username, password, successCb, failureCb) {
+        if (isGAS) {
+          google.script.run
+            .withSuccessHandler(successCb)
+            .withFailureHandler(failureCb)
+            .doGet({ parameter: { action: 'adminLogin', username: username, password: password } });
+        } else if (APP_SCRIPT_URL) {
+          const fetchUrl = `${APP_SCRIPT_URL}?action=adminLogin&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+          fetch(fetchUrl)
+            .then(res => res.json())
+            .then(res => { if(res.success) successCb(res); else failureCb(new Error(res.error)); })
+            .catch(err => failureCb(err));
+        } else {
+          // Simulasi Login
+          setTimeout(() => {
+            if (username === 'admin' && password === 'adminuinar') {
+              successCb({ success: true, token: 'SESSION_MOCK_123' });
+            } else {
+              failureCb(new Error('Kredensial simulasi salah! (Gunakan Username: admin, Password: adminuinar)'));
+            }
+          }, 300);
+        }
+      },
+      getAllBookings: function(token, successCb, failureCb) {
+        if (isGAS) {
+          google.script.run
+            .withSuccessHandler(successCb)
+            .withFailureHandler(failureCb)
+            .doGet({ parameter: { action: 'getAllBookings', token: token } });
+        } else if (APP_SCRIPT_URL) {
+          const fetchUrl = `${APP_SCRIPT_URL}?action=getAllBookings&token=${encodeURIComponent(token)}`;
+          fetch(fetchUrl)
+            .then(res => res.json())
+            .then(res => { if(res.success) successCb(res.bookings); else failureCb(new Error(res.error)); })
+            .catch(err => failureCb(err));
+        } else {
+          // Simulasi Ambil Semua Data
+          setTimeout(() => {
+            // Urutkan terbalik agar yang baru di atas
+            successCb([...window.localMockBookings].reverse());
+          }, 400);
+        }
+      },
+      updateStatus: function(bookingId, status, token, successCb, failureCb) {
+        if (isGAS) {
+          google.script.run
+            .withSuccessHandler(successCb)
+            .withFailureHandler(failureCb)
+            .doPost({ postData: { contents: JSON.stringify({ action: 'updateStatus', bookingId: bookingId, status: status, token: token }) } });
+        } else if (APP_SCRIPT_URL) {
+          fetch(APP_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'updateStatus', bookingId: bookingId, status: status, token: token })
+          })
+          .then(() => successCb({ success: true }))
+          .catch(err => failureCb(err));
+        } else {
+          // Simulasi Update Status
+          setTimeout(() => {
+            const found = window.localMockBookings.find(b => b.bookingId === bookingId);
+            if (found) {
+              found.status = status;
+              successCb({ success: true });
+            } else {
+              failureCb(new Error('ID Booking tidak ditemukan.'));
+            }
+          }, 300);
+        }
+      }
+    };
 
     window.onload = function() {
-      // Inisialisasi input URL di Alert Box jika ada
       if (APP_SCRIPT_URL) {
         document.getElementById('api-url-input').value = APP_SCRIPT_URL;
       }
@@ -307,6 +790,7 @@
       document.getElementById('form-lapangan-hidden').value = document.getElementById('select-court').value;
       
       checkAvailability();
+      populateReportMonthSelect();
     };
 
     function saveApiUrl() {
@@ -324,7 +808,7 @@
     /**
      * Memanggil API Backend Apps Script dengan Fetch
      */
-    async function checkAvailability() {
+    function checkAvailability() {
       const court = document.getElementById('select-court').value;
       const date = document.getElementById('select-date').value;
       
@@ -333,43 +817,25 @@
 
       if (!date) return;
 
-      // Sembunyikan Grid & Tampilkan Loading
       document.getElementById('slots-grid').classList.add('hidden');
       document.getElementById('schedule-loader').classList.remove('hidden');
 
-      // Gunakan Simulasi jika API Key Google Apps Script belum diset
-      if (!APP_SCRIPT_URL) {
-        console.log("Menggunakan simulasi lokal (API URL kosong).");
-        // Berikan contoh data sibuk untuk simulasi
-        currentlyBookedSlots = ["10:00", "11:00", "16:00", "17:00"];
-        setTimeout(() => {
+      Backend.getBookedSlots(
+        date, 
+        court, 
+        function(bookedSlots) {
+          currentlyBookedSlots = bookedSlots || [];
           renderSlotsGrid();
           populateTimeSelectors();
+          
           document.getElementById('schedule-loader').classList.add('hidden');
           document.getElementById('slots-grid').classList.remove('hidden');
-        }, 500);
-        return;
-      }
-
-      try {
-        const fetchUrl = `${APP_SCRIPT_URL}?date=${encodeURIComponent(date)}&court=${encodeURIComponent(court)}`;
-        const response = await fetch(fetchUrl);
-        const result = await response.json();
-
-        if (result.success) {
-          currentlyBookedSlots = result.bookedSlots || [];
-        } else {
-          showAlert(result.error || 'Gagal mengecek ketersediaan.');
+        },
+        function(err) {
+          showAlert(err.message || 'Gagal mengecek ketersediaan.');
+          document.getElementById('schedule-loader').classList.add('hidden');
         }
-      } catch (err) {
-        console.error(err);
-        showAlert('Gagal menghubungi server Google Sheets. Pastikan URL Web App valid dan CORS aktif.');
-      } finally {
-        renderSlotsGrid();
-        populateTimeSelectors();
-        document.getElementById('schedule-loader').classList.add('hidden');
-        document.getElementById('slots-grid').classList.remove('hidden');
-      }
+      );
     }
 
     function renderSlotsGrid() {
@@ -457,7 +923,7 @@
     /**
      * Submit Booking ke Google Apps Script via POST
      */
-    async function handleFormSubmit(e) {
+    function handleFormSubmit(e) {
       e.preventDefault();
       
       const form = document.getElementById('form-booking');
@@ -487,74 +953,27 @@
         jamSelesai: form.jamSelesai.value
       };
 
-      // Simulasi lokal jika URL Web App belum diset
-      if (!APP_SCRIPT_URL) {
-        setTimeout(() => {
-          const randId = Math.floor(1000 + Math.random() * 9000);
-          const durasi = endHour - startHour;
-          let baseTarif = 50000;
-          if (bookingData.kategori === 'Mahasiswa UIN') baseTarif = 25000;
-          else if (bookingData.kategori === 'Dosen/Staff UIN') baseTarif = 35000;
-          const totalBiaya = baseTarif * durasi;
-
-          const mockResult = {
-            success: true,
-            bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${randId}`,
-            nama: bookingData.nama,
-            kategori: bookingData.kategori,
-            lapangan: bookingData.lapangan,
-            tanggalMain: bookingData.tanggalMain,
-            jam: `${bookingData.jamMulai} - ${bookingData.jamSelesai} WIB`,
-            durasi: `${durasi} Jam`,
-            totalBiaya: 'Rp ' + totalBiaya.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-            status: 'Menunggu Pembayaran (Konfirmasi ke Pengelola)'
-          };
-          
-          showReceiptModal(mockResult);
+      Backend.submitBooking(
+        bookingData,
+        function(result) {
+          showReceiptModal(result);
           submitBtn.disabled = false;
-          submitBtn.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i><span>Proses Reservasi Lapangan</span>`;
+          submitBtn.innerHTML = `
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
+            <span>Proses Reservasi Lapangan</span>
+          `;
           form.reset();
-        }, 1000);
-        return;
-      }
-
-      try {
-        const response = await fetch(APP_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors', // Mode No-CORS aman untuk menyimpan data ke GAS
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bookingData)
-        });
-
-        // Catatan: Mode no-cors mengembalikan tipe respon "opaque" (tanpa body pembacaan langsung).
-        // Kita berasumsi proses berhasil jika tidak ada error network, lalu mengonfirmasi ketersediaan terbaru.
-        const mockEstPrice = (endHour - startHour) * (bookingData.kategori === 'Mahasiswa UIN' ? 25000 : bookingData.kategori === 'Dosen/Staff UIN' ? 35000 : 50000);
-        const successFallback = {
-          success: true,
-          bookingId: `SC-${bookingData.tanggalMain.replace(/-/g, '')}-${Math.floor(1000 + Math.random()*9000)}`,
-          nama: bookingData.nama,
-          kategori: bookingData.kategori,
-          lapangan: bookingData.lapangan,
-          tanggalMain: bookingData.tanggalMain,
-          jam: `${bookingData.jamMulai} - ${bookingData.jamSelesai} WIB`,
-          durasi: `${endHour - startHour} Jam`,
-          totalBiaya: 'Rp ' + mockEstPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
-        };
-
-        showReceiptModal(successFallback);
-        form.reset();
-        checkAvailability();
-
-      } catch (err) {
-        console.error(err);
-        showAlert('Gagal melakukan pendaftaran. Silakan cek koneksi internet Anda.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `
-          <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
-          <span>Proses Reservasi Lapangan</span>
-        `;
-      }
+          checkAvailability();
+        },
+        function(err) {
+          showAlert(err.message || 'Gagal menyimpan pesanan.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-uin-gold"></i>
+            <span>Proses Reservasi Lapangan</span>
+          `;
+        }
+      );
     }
 
     function showReceiptModal(data) {
@@ -587,10 +1006,32 @@
             <span class="text-gray-500">Waktu</span>
             <span class="font-semibold">${data.jam}</span>
           </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Status</span>
+            <span class="font-bold text-amber-600">${data.status || 'Pending'}</span>
+          </div>
           <div class="flex justify-between pt-2 border-t border-dashed border-gray-200">
             <span class="font-bold">Estimasi Biaya</span>
             <span class="text-lg font-extrabold text-uin-green">${data.totalBiaya}</span>
           </div>
+        </div>
+        <div class="bg-amber-50 text-[11px] p-3 rounded-lg border text-amber-950">
+          <strong>Perhatian:</strong> Silakan cetak tanda bukti di bawah ini dan lampirkan saat melakukan konfirmasi pembayaran ke WhatsApp Admin.
+        </div>
+      `;
+
+      // Siapkan data cetak fisik struk tersendiri (bebas elemen web lainnya)
+      const printReceiptArea = document.getElementById('print-receipt-details');
+      printReceiptArea.innerHTML = `
+        <div class="flex justify-between"><span>No Booking:</span><strong>${data.bookingId}</strong></div>
+        <div class="flex justify-between"><span>Nama:</span><span>${data.nama}</span></div>
+        <div class="flex justify-between"><span>Kategori:</span><span>${data.kategori}</span></div>
+        <div class="flex justify-between"><span>Lapangan:</span><span>${data.lapangan}</span></div>
+        <div class="flex justify-between"><span>Tanggal Main:</span><span>${data.tanggalMain}</span></div>
+        <div class="flex justify-between"><span>Waktu:</span><span>${data.jam}</span></div>
+        <div class="flex justify-between"><span>Durasi:</span><span>${data.durasi}</span></div>
+        <div class="flex justify-between border-t border-dashed border-black pt-1 mt-1 font-bold">
+          <span>Biaya Sewa:</span><span>${data.totalBiaya}</span>
         </div>
       `;
 
@@ -612,15 +1053,370 @@
       document.getElementById('receipt-modal').classList.add('hidden');
     }
 
+    // --- LOGIKA ADMIN PANEL & DASHBOARD ---
+
+    function toggleAdminView() {
+      const isVisible = !document.getElementById('admin-section').classList.contains('hidden');
+      
+      if (isVisible) {
+        showBookingTab();
+      } else {
+        document.getElementById('hero-banner').classList.add('hidden');
+        document.getElementById('booking-section').classList.add('hidden');
+        document.getElementById('admin-section').classList.remove('hidden');
+        
+        if (isAdminLoggedIn) {
+          showAdminDashboard();
+        } else {
+          showAdminLogin();
+        }
+      }
+    }
+
+    function showBookingTab() {
+      document.getElementById('hero-banner').classList.remove('hidden');
+      document.getElementById('booking-section').classList.remove('hidden');
+      document.getElementById('admin-section').classList.add('hidden');
+      document.getElementById('nav-admin-btn').innerHTML = `<i data-lucide="shield-check" class="w-4 h-4 text-uin-gold"></i> Panel Pengelola`;
+      lucide.createIcons();
+    }
+
+    function showAdminLogin() {
+      document.getElementById('admin-login-card').classList.remove('hidden');
+      document.getElementById('admin-dashboard-panel').classList.add('hidden');
+      document.getElementById('nav-admin-btn').innerHTML = `<i data-lucide="home" class="w-4 h-4 text-uin-gold"></i> Kembali`;
+      lucide.createIcons();
+    }
+
+    function showAdminDashboard() {
+      document.getElementById('admin-login-card').classList.add('hidden');
+      document.getElementById('admin-dashboard-panel').classList.remove('hidden');
+      document.getElementById('nav-admin-btn').innerHTML = `<i data-lucide="home" class="w-4 h-4 text-uin-gold"></i> Halaman Utama`;
+      lucide.createIcons();
+      refreshAdminData();
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('admin-username').value.trim();
+      const p = document.getElementById('admin-password').value;
+      const btn = document.getElementById('login-btn');
+
+      btn.disabled = true;
+      btn.textContent = 'Mengecek Otoritas...';
+
+      Backend.adminLogin(u, p, 
+        function(res) {
+          btn.disabled = false;
+          btn.textContent = 'Masuk ke Dashboard';
+          if (res.success) {
+            isAdminLoggedIn = true;
+            adminToken = res.token;
+            showAdminDashboard();
+          } else {
+            showAlert(res.error || 'Gagal login.');
+          }
+        },
+        function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Masuk ke Dashboard';
+          showAlert(err.message || 'Gagal melakukan login.');
+        }
+      );
+    }
+
+    function handleAdminLogout() {
+      isAdminLoggedIn = false;
+      adminToken = '';
+      allBookingsList = [];
+      showBookingTab();
+    }
+
+    function refreshAdminData() {
+      const loader = document.createElement('div');
+      loader.className = "fixed inset-0 bg-white/50 flex items-center justify-center z-50";
+      loader.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-uin-green"></div>`;
+      document.body.appendChild(loader);
+
+      Backend.getAllBookings(adminToken, 
+        function(bookings) {
+          loader.remove();
+          allBookingsList = bookings || [];
+          renderAdminDashboardData();
+        },
+        function(err) {
+          loader.remove();
+          showAlert('Gagal mengambil data reservasi: ' + err.message);
+        }
+      );
+    }
+
+    function renderAdminDashboardData() {
+      // 1. Hitung Statistik Utama
+      let totalBooking = allBookingsList.length;
+      let totalRevenue = 0;
+      let pendingCount = 0;
+      let completedCount = 0;
+
+      allBookingsList.forEach(b => {
+        if (b.status === 'Lunas') {
+          totalRevenue += b.totalBiaya;
+          completedCount++;
+        } else if (b.status === 'Pending') {
+          pendingCount++;
+        }
+      });
+
+      document.getElementById('stat-total-booking').textContent = totalBooking;
+      document.getElementById('stat-total-revenue').textContent = formatRupiah(totalRevenue);
+      document.getElementById('stat-pending').textContent = pendingCount;
+      document.getElementById('stat-completed').textContent = completedCount;
+
+      // 2. Render Tabel Reservasi
+      renderBookingsTable(allBookingsList);
+
+      // 3. Update Rekap Laporan Bulanan Ringkas
+      updateMonthlyMiniStats();
+    }
+
+    function renderBookingsTable(list) {
+      const tbody = document.getElementById('admin-bookings-rows');
+      tbody.innerHTML = '';
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">Tidak ada data reservasi ditemukan.</td></tr>`;
+        return;
+      }
+
+      list.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+
+        let statusClass = 'bg-amber-100 text-amber-800';
+        if (b.status === 'Lunas') statusClass = 'bg-green-100 text-green-800';
+        else if (b.status === 'Batal') statusClass = 'bg-red-100 text-red-800';
+
+        tr.innerHTML = `
+          <td class="p-4">
+            <div class="font-mono font-bold text-uin-green">${b.bookingId}</div>
+            <div class="text-[10px] text-gray-500 mt-0.5">${b.tanggalMain}</div>
+          </td>
+          <td class="p-4">
+            <div class="font-semibold text-gray-900">${b.nama}</div>
+            <div class="text-[10px] text-gray-500">${b.kategori} • ${b.whatsapp}</div>
+          </td>
+          <td class="p-4">
+            <div class="font-medium text-gray-700">${b.lapangan}</div>
+            <div class="text-[10px] text-gray-500">${b.jamMulai} - ${b.jamSelesai}</div>
+          </td>
+          <td class="p-4 font-bold text-gray-800">${formatRupiah(b.totalBiaya)}</td>
+          <td class="p-4 text-center">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${statusClass}">${b.status}</span>
+          </td>
+          <td class="p-4 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="changeBookingStatus('${b.bookingId}', 'Lunas')" title="Tandai Lunas" class="bg-green-500 hover:bg-green-600 text-white p-1 rounded transition-colors">
+                <i data-lucide="check-square" class="w-4 h-4"></i>
+              </button>
+              <button onclick="changeBookingStatus('${b.bookingId}', 'Batal')" title="Batalkan" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors">
+                <i data-lucide="x-square" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function filterBookingsTable() {
+      const q = document.getElementById('admin-search').value.toLowerCase().trim();
+      if (!q) {
+        renderBookingsTable(allBookingsList);
+        return;
+      }
+
+      const filtered = allBookingsList.filter(b => 
+        b.nama.toLowerCase().includes(q) || 
+        b.bookingId.toLowerCase().includes(q) ||
+        b.whatsapp.includes(q)
+      );
+      renderBookingsTable(filtered);
+    }
+
+    function changeBookingStatus(bookingId, status) {
+      if(!confirm(`Apakah Anda yakin ingin menandai Reservasi ${bookingId} sebagai [${status}]?`)) return;
+
+      const loader = document.createElement('div');
+      loader.className = "fixed inset-0 bg-white/50 flex items-center justify-center z-50";
+      loader.innerHTML = `<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-uin-green"></div>`;
+      document.body.appendChild(loader);
+
+      Backend.updateStatus(bookingId, status, adminToken, 
+        function(res) {
+          loader.remove();
+          if (res.success) {
+            showAlert(`Status booking ${bookingId} berhasil diubah ke ${status}.`);
+            refreshAdminData();
+          } else {
+            showAlert('Gagal mengubah status: ' + res.error);
+          }
+        },
+        function(err) {
+          loader.remove();
+          showAlert('Koneksi bermasalah: ' + err.message);
+        }
+      );
+    }
+
+    // --- LOGIKA REKAP BULANAN & CETAK LAPORAN ---
+
+    function populateReportMonthSelect() {
+      const select = document.getElementById('report-month-select');
+      select.innerHTML = '';
+
+      const bulanIndo = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      // Hasilkan daftar 12 bulan terakhir untuk dipilah
+      const now = new Date();
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const valStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const labelStr = `${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;
+        
+        const opt = document.createElement('option');
+        opt.value = valStr;
+        opt.textContent = labelStr;
+        select.appendChild(opt);
+      }
+    }
+
+    function filterBookingsByMonth(yearMonthStr) {
+      // Format input yearMonthStr: "YYYY-MM"
+      return allBookingsList.filter(b => {
+        if (!b.tanggalMainRaw) return false;
+        return b.tanggalMainRaw.substring(0, 7) === yearMonthStr;
+      });
+    }
+
+    function updateMonthlyMiniStats() {
+      const selectedYM = document.getElementById('report-month-select').value;
+      const list = filterBookingsByMonth(selectedYM);
+
+      let totalCount = list.length;
+      let totalRevenue = 0;
+      let katCounts = { 'Mahasiswa UIN': 0, 'Dosen/Staff UIN': 0, 'Umum': 0 };
+
+      list.forEach(b => {
+        if (b.status === 'Lunas') {
+          totalRevenue += b.totalBiaya;
+        }
+        if (katCounts[b.kategori] !== undefined) {
+          katCounts[b.kategori]++;
+        }
+      });
+
+      // Cari kategori terbanyak
+      let topKat = 'N/A';
+      let maxCount = 0;
+      for (let k in katCounts) {
+        if (katCounts[k] > maxCount) {
+          maxCount = katCounts[k];
+          topKat = k;
+        }
+      }
+
+      document.getElementById('month-stat-count').textContent = totalCount;
+      document.getElementById('month-stat-revenue').textContent = formatRupiah(totalRevenue);
+      document.getElementById('month-stat-top').textContent = maxCount > 0 ? `${topKat} (${maxCount})` : 'N/A';
+    }
+
+    // Trigger update mini stats saat pilihan bulan diubah
+    document.getElementById('report-month-select').addEventListener('change', updateMonthlyMiniStats);
+
+    /**
+     * Mempersiapkan layout cetak laporan bulanan di area tersembunyi
+     */
+    function prepareReportPrintData() {
+      const select = document.getElementById('report-month-select');
+      const selectedYM = select.value;
+      const list = filterBookingsByMonth(selectedYM);
+
+      // Set Label Periode
+      document.getElementById('print-report-period').textContent = select.options[select.selectedIndex].text;
+      
+      // Set Hari Ini untuk ttd
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('print-report-today-date').textContent = new Date().toLocaleDateString('id-ID', options);
+
+      const tbody = document.getElementById('print-report-table-rows');
+      tbody.innerHTML = '';
+
+      let lunasCount = 0;
+      let lunasRevenue = 0;
+      let totalEst = 0;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 border text-center text-gray-500">Tidak ada transaksi sewa di periode bulan ini.</td></tr>`;
+      } else {
+        list.reverse().forEach((b, index) => {
+          totalEst += b.totalBiaya;
+          if (b.status === 'Lunas') {
+            lunasCount++;
+            lunasRevenue += b.totalBiaya;
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = 'border';
+          tr.innerHTML = `
+            <td class="border p-2 text-center">${index + 1}</td>
+            <td class="border p-2 font-mono font-bold">${b.bookingId}</td>
+            <td class="border p-2">${b.nama}</td>
+            <td class="border p-2">${b.kategori}</td>
+            <td class="border p-2">${b.lapangan}</td>
+            <td class="border p-2 text-center">${b.tanggalMain}</td>
+            <td class="border p-2 text-center">${b.jamMulai}-${b.jamSelesai}</td>
+            <td class="border p-2 text-right">${formatRupiah(b.totalBiaya)}</td>
+            <td class="border p-2 text-center font-bold">${b.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('print-report-total-count').textContent = `${list.length} Pemesanan (Lunas: ${lunasCount})`;
+      document.getElementById('print-report-total-revenue').textContent = formatRupiah(lunasRevenue);
+      document.getElementById('print-report-grand-total').textContent = formatRupiah(totalEst);
+    }
+
+    function previewMonthlyReport() {
+      prepareReportPrintData();
+      showAlert('Laporan bulanan telah siap cetak. Silakan klik tombol "Cetak Laporan Bulanan" untuk cetak fisik.');
+    }
+
+    function printMonthlyReport() {
+      prepareReportPrintData();
+      setTimeout(() => {
+        window.print();
+      }, 300);
+    }
+
     function showAlert(msg) {
       const alertBox = document.getElementById('custom-alert');
       document.getElementById('alert-text').textContent = msg;
       alertBox.classList.remove('hidden');
-      setTimeout(() => hideAlert(), 5000);
+      setTimeout(() => hideAlert(), 6000);
     }
 
     function hideAlert() {
       document.getElementById('custom-alert').classList.add('hidden');
+    }
+
+    function formatRupiah(angka) {
+      if (angka === undefined || angka === null || isNaN(angka)) return 'Rp 0';
+      return 'Rp ' + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
   </script>
 </body>
